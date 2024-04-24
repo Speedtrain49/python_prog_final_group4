@@ -243,7 +243,20 @@ class SudokuGenerator:
 	Return: None
     '''
     def remove_cells(self):
-        pass
+        positions = []
+        for row in range(9):
+            for col in range(9):
+                #checks to see if value in board at a specific point is 0 already
+                if self.board[row][col] != 0:
+                    positions.append((row, col))
+        #randomizes positions
+        random.shuffle(positions)
+
+        #for loop to remove the numbers at the randomized positions
+        for x in range(min(self.removed_cells, len(positions))):
+            row, col = positions.pop()
+            #sets value to 0 to remove it
+            self.board[row][col] = 0
 
 '''
 DO NOT CHANGE
@@ -264,6 +277,7 @@ def generate_sudoku(size, removed):
     sudoku = SudokuGenerator(size, removed)
     sudoku.fill_values()
     board = sudoku.get_board()
+    ans_board = [rows[:] for rows in sudoku.get_board()]
     sudoku.remove_cells()
     board = sudoku.get_board()
-    return board
+    return board, ans_board
