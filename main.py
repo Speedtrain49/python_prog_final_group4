@@ -56,7 +56,22 @@ def draw_game_start(screen):
     pygame.draw.rect(screen, boxColors, hardBackG)
     screen.blit(hardSurface, hardRect)
 
-    pygame.display.flip()
+    #Traps user until they select a difficulty or close the game
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    #This is how we select difficulties,
+                    #replace the print with the code to draw board and such, then go back to main.
+                    if easyRect.collidepoint(event.pos):
+                        print("easy selected")
+                    elif mediumRect.collidepoint(event.pos):
+                        print("medium selected")
+                    elif hardRect.collidepoint(event.pos):
+                        print("hard selected")
+        pygame.display.flip()
 
 def main():
 
@@ -86,8 +101,7 @@ def main():
     screen = pygame.display.set_mode((width,height))
 
     draw_game_start(screen)
-    while True:
-        pass
+
 
 
 if __name__ == "__main__":
