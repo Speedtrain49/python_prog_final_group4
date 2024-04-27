@@ -6,6 +6,16 @@ import sys
 textColor = "black"
 width = 500
 height = 600
+
+
+
+#used to determine whether mouse is over button
+def is_over_button(pos, button_rect):
+    x, y = pos
+    if button_rect.left < x < button_rect.right and button_rect.top < y < button_rect.bottom:
+        return True
+    return False
+
 def draw_game_start(screen):
     #sets font sizes
     titleFont = pygame.font.Font(None,70)
@@ -67,12 +77,68 @@ def draw_game_start(screen):
                     #replace the print with the code to draw board and such, then go back to main.
                     if easyRect.collidepoint(event.pos):
                         print("easy selected")
+                        play(screen, 30)
                     elif mediumRect.collidepoint(event.pos):
                         print("medium selected")
+                        play(screen, 40)
                     elif hardRect.collidepoint(event.pos):
                         print("hard selected")
+                        play(screen, 50)
         pygame.display.flip()
 
+
+def play(screen, mode):
+    font = pygame.font.Font(None, 40)
+    small_font = pygame.font.Font(None, 30)
+    smaller_font = pygame.font.Font(None, 25)
+    large_font = pygame.font.Font(None, 60)
+
+    button_1_rect = pygame.Rect(0, height - 60, 180, 60)
+    button_2_rect = pygame.Rect(180, height - 60, 180, 60)
+    button_3_rect = pygame.Rect(360, height - 60, 180, 60)
+    #inititating screen
+    running = True
+
+    screen.fill(color="white")
+    #draw buttons - for sudoku screen
+    pygame.draw.rect(screen, (200, 200, 200), button_1_rect)
+    pygame.draw.rect(screen, (200, 200, 200), button_2_rect)
+    pygame.draw.rect(screen, (200, 200, 200), button_3_rect)
+
+    # Button labels
+    reset_text = small_font.render("Reset", True, (0, 0, 0))
+    restart_text = small_font.render("Restart", True, (0, 0, 0))
+    exit_text = small_font.render("Exit", True, (0, 0, 0))
+
+    # Buttons for sudoku game
+    screen.blit(reset_text, (button_1_rect.centerx - reset_text.get_width() // 2, button_1_rect.centery - reset_text.get_height() // 2))
+    screen.blit(restart_text, (button_2_rect.centerx - restart_text.get_width() // 2, button_2_rect.centery - restart_text.get_height() // 2))
+    screen.blit(exit_text, (button_3_rect.centerx - exit_text.get_width() // 2, button_3_rect.centery - exit_text.get_height() // 2))
+
+    while running:
+
+        pygame.display.flip()
+
+        for event in pygame.event.get():
+            print(event.type)
+            if event.type == pygame.QUIT:
+                print("Quit")
+                running = False
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_pos = pygame.mouse.get_pos()
+                if is_over_button(mouse_pos, button_1_rect):
+                    # Reset board to initial state
+                    print("Reset")
+                elif is_over_button(mouse_pos, button_2_rect):
+                    # Restart will take the user back to the welcome screen
+                    print("Restart")
+                    draw_game_start(screen)
+                elif is_over_button(mouse_pos, button_3_rect):
+                    # Exit will end the game
+                    print("Quit")
+                    running = False
+                    pygame.quit()
+                    sys.exit()
 def main():
 
     #EVERYTHING HERE IS FOR TESTING
