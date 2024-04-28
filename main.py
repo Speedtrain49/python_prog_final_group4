@@ -1,5 +1,6 @@
 from sudoku_generator import SudokuGenerator
 from sudoku_generator import generate_sudoku
+from board import Board
 import pygame
 import sys
 
@@ -78,24 +79,32 @@ def draw_game_start(screen):
                     if easyRect.collidepoint(event.pos):
                         print("easy selected")
                         play(screen, 30)
+                        return 1
                     elif mediumRect.collidepoint(event.pos):
                         print("medium selected")
                         play(screen, 40)
+                        return 1
                     elif hardRect.collidepoint(event.pos):
                         print("hard selected")
                         play(screen, 50)
+                        return 1
         pygame.display.flip()
 
 
 def play(screen, mode):
+
+    screen.fill(color="white")
+
+    board_play = Board(width, height, screen, mode)
+
     font = pygame.font.Font(None, 40)
     small_font = pygame.font.Font(None, 30)
     smaller_font = pygame.font.Font(None, 25)
     large_font = pygame.font.Font(None, 60)
 
-    button_1_rect = pygame.Rect(0, height - 60, 180, 60)
-    button_2_rect = pygame.Rect(180, height - 60, 180, 60)
-    button_3_rect = pygame.Rect(360, height - 60, 180, 60)
+    button_1_rect = pygame.Rect(0, height - 100, 180, 110)
+    button_2_rect = pygame.Rect(180, height - 100, 180, 110)
+    button_3_rect = pygame.Rect(360, height - 100, 180, 110)
     #inititating screen
     running = True
 
@@ -115,8 +124,14 @@ def play(screen, mode):
     screen.blit(restart_text, (button_2_rect.centerx - restart_text.get_width() // 2, button_2_rect.centery - restart_text.get_height() // 2))
     screen.blit(exit_text, (button_3_rect.centerx - exit_text.get_width() // 2, button_3_rect.centery - exit_text.get_height() // 2))
 
-    while running:
+    #checks if mouse on screen
+    screen_rect = pygame.Rect(0, 0, width, height)
 
+    board_play.draw()
+    col, row = 0, 0
+    old_mouse_x, old_mouse_y = 0, 0
+    while running:
+        mouse_x, mouse_y = pygame.mouse.get_pos()
         pygame.display.flip()
 
         for event in pygame.event.get():
@@ -124,11 +139,14 @@ def play(screen, mode):
             if event.type == pygame.QUIT:
                 print("Quit")
                 running = False
+                pygame.quit()
+                sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
                 if is_over_button(mouse_pos, button_1_rect):
                     # Reset board to initial state
                     print("Reset")
+                    board_play.reset_to_original()
                 elif is_over_button(mouse_pos, button_2_rect):
                     # Restart will take the user back to the welcome screen
                     print("Restart")
@@ -136,9 +154,41 @@ def play(screen, mode):
                 elif is_over_button(mouse_pos, button_3_rect):
                     # Exit will end the game
                     print("Quit")
-                    running = False
                     pygame.quit()
                     sys.exit()
+                    running = False
+                elif screen_rect.collidepoint(mouse_pos):
+                    #selects square
+                    board_play.select(10, 10)
+                    col, row = board_play.click(mouse_x, mouse_y)
+                    board_play.select(col, row)
+            elif event.type == pygame.KEYDOWN:
+                if pygame.K_1 <= event.key <= pygame.K_9:
+                    if event.key == pygame.K_1:
+                        board_play.sketch(1,col,row)
+                    elif event.key == pygame.K_2:
+                        board_play.sketch(2,col,row)
+                    elif event.key == pygame.K_3:
+                        board_play.sketch(3,col,row)
+                    elif event.key == pygame.K_4:
+                        board_play.sketch(4,col,row)
+                    elif event.key == pygame.K_5:
+                        board_play.sketch(5,col,row)
+                    elif event.key == pygame.K_6:
+                        board_play.sketch(6,col,row)
+                    elif event.key == pygame.K_7:
+                        board_play.sketch(7,col,row)
+                    elif event.key == pygame.K_8:
+                        board_play.sketch(8,col,row)
+                    elif event.key == pygame.K_9:
+                        board_play.sketch(9,col,row)
+                elif event.key == pygame.K_BACKSPACE:
+                    board_play.clear(col, row)
+                elif event.key == pygame.K_RETURN:
+                    board_play.place_number(col, row)
+        board_play.is_full()
+
+
 def main():
 
     #EVERYTHING HERE IS FOR TESTING
@@ -158,15 +208,15 @@ def main():
     #in the call below I am passing in 50 for a hard game
 
     #I modified generate_sudoku to return the board (b) and the solution to the board (a)
-    b, a = generate_sudoku(9, 50)
+    b = generate_sudoku(9, 50)
     print(b)
-    print(a)
 
     #Initialises pygame
-    pygame.init()
-    screen = pygame.display.set_mode((width,height))
+    while True:
+        pygame.init()
+        screen = pygame.display.set_mode((width,height))
+        draw_game_start(screen)
 
-    draw_game_start(screen)
 
 
 
