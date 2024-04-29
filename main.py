@@ -268,6 +268,17 @@ def play(screen, mode):
                     board_play.clear(col, row)
                 elif event.key == pygame.K_RETURN:
                     board_play.place_number(col, row)
+                    if board_play.is_full():
+                        if board_play.check_board():
+                            #display game won screen
+                            print("Game Won")
+                            running = False
+                            return 1
+                        else:
+                            #display game over screen
+                            print("Game Lost")
+                            running = False
+                            return 2
                 if event.key == pygame.K_UP and row != 1:
                     board_play.select(10, 10)
                     col, row = (col, row - 1)
@@ -284,13 +295,6 @@ def play(screen, mode):
                     board_play.select(10, 10)
                     col, row = (col + 1, row)
                     board_play.select(col, row)
-        if board_play.is_full():
-            if board_play.check_board() == True:
-                running = False
-    if board_play.check_board() == True:
-        return 1
-    else:
-        return 2
 
 
 
