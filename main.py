@@ -77,19 +77,102 @@ def draw_game_start(screen):
                     #This is how we select difficulties,
                     #replace the print with the code to draw board and such, then go back to main.
                     if easyRect.collidepoint(event.pos):
-                        print("easy selected")
-                        play(screen, 30)
-                        return 1
+                        if play(screen, 30) == 1:
+                            win_screen(screen)
+                        else:
+                            loose_screen(screen)
                     elif mediumRect.collidepoint(event.pos):
-                        print("medium selected")
-                        play(screen, 40)
-                        return 1
+                        if play(screen, 40) == 1:
+                            win_screen(screen)
+                        else:
+                            loose_screen(screen)
                     elif hardRect.collidepoint(event.pos):
-                        print("hard selected")
-                        play(screen, 50)
-                        return 1
+                        if play(screen, 50) == 1:
+                            win_screen(screen)
+                        else:
+                            loose_screen(screen)
         pygame.display.flip()
 
+def loose_screen(screen):
+    # sets font sizes
+    titleFont = pygame.font.Font(None, 70)
+    subFont = pygame.font.Font(None, 50)
+
+    # sets colors
+    screen.fill(color="white")
+    boxColors = "orange"
+
+    # draws title text
+    titleText = titleFont.render("Game Over :(", 0, textColor)
+    titleRect = titleText.get_rect(center=(width // 2, height // 2 - 200))
+    screen.blit(titleText, titleRect)
+
+    # draws Option
+
+    # draws medium box
+    mediumBackG = pygame.Rect(150, 360, 200, 80)
+    mediumText = subFont.render("RESTART", 0, textColor)
+    mediumSurface = pygame.Surface((mediumText.get_size()[0] + 20, mediumText.get_size()[1] + 20))
+    mediumSurface.fill(color="white")
+    mediumSurface.blit(mediumText, (10, 10))
+    mediumRect = mediumSurface.get_rect(center=(width // 2, height // 2 + 100))
+    pygame.draw.rect(screen, boxColors, mediumBackG)
+    screen.blit(mediumSurface, mediumRect)
+
+
+    # Traps user until they select a difficulty or close the game
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    # This is how we select difficulties,
+                    # replace the print with the code to draw board and such, then go back to main.
+                    if mediumRect.collidepoint(event.pos):
+                        draw_game_start(screen)
+        pygame.display.flip()
+
+def win_screen(screen):
+    # sets font sizes
+    titleFont = pygame.font.Font(None, 70)
+    subFont = pygame.font.Font(None, 50)
+
+    # sets colors
+    screen.fill(color="white")
+    boxColors = "orange"
+
+    # draws title text
+    titleText = titleFont.render("Game Won!", 0, textColor)
+    titleRect = titleText.get_rect(center=(width // 2, height // 2 - 200))
+    screen.blit(titleText, titleRect)
+
+    # draws Option
+
+    # draws medium box
+    mediumBackG = pygame.Rect(170, 360, 160, 80)
+    mediumText = subFont.render("EXIT", 0, textColor)
+    mediumSurface = pygame.Surface((mediumText.get_size()[0] + 20, mediumText.get_size()[1] + 20))
+    mediumSurface.fill(color="white")
+    mediumSurface.blit(mediumText, (10, 10))
+    mediumRect = mediumSurface.get_rect(center=(width // 2, height // 2 + 100))
+    pygame.draw.rect(screen, boxColors, mediumBackG)
+    screen.blit(mediumSurface, mediumRect)
+
+
+    # Traps user until they select a difficulty or close the game
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    # This is how we select difficulties,
+                    # replace the print with the code to draw board and such, then go back to main.
+                    if mediumRect.collidepoint(event.pos):
+                        pygame.quit()
+                        sys.exit()
+        pygame.display.flip()
 
 def play(screen, mode):
 
@@ -130,14 +213,16 @@ def play(screen, mode):
     board_play.draw()
     col, row = 0, 0
     old_mouse_x, old_mouse_y = 0, 0
+
+    print(board_play.sudoku)
+    print(board_play.sudokuans)
+
     while running:
         mouse_x, mouse_y = pygame.mouse.get_pos()
         pygame.display.flip()
 
         for event in pygame.event.get():
-            print(event.type)
             if event.type == pygame.QUIT:
-                print("Quit")
                 running = False
                 pygame.quit()
                 sys.exit()
@@ -145,15 +230,12 @@ def play(screen, mode):
                 mouse_pos = pygame.mouse.get_pos()
                 if is_over_button(mouse_pos, button_1_rect):
                     # Reset board to initial state
-                    print("Reset")
                     board_play.reset_to_original()
                 elif is_over_button(mouse_pos, button_2_rect):
                     # Restart will take the user back to the welcome screen
-                    print("Restart")
                     draw_game_start(screen)
                 elif is_over_button(mouse_pos, button_3_rect):
                     # Exit will end the game
-                    print("Quit")
                     pygame.quit()
                     sys.exit()
                     running = False
@@ -186,30 +268,36 @@ def play(screen, mode):
                     board_play.clear(col, row)
                 elif event.key == pygame.K_RETURN:
                     board_play.place_number(col, row)
-        board_play.is_full()
+                if event.key == pygame.K_UP and row != 1:
+                    board_play.select(10, 10)
+                    col, row = (col, row - 1)
+                    board_play.select(col, row)
+                elif event.key == pygame.K_DOWN and row != 9:
+                    board_play.select(10, 10)
+                    col, row = (col, row + 1)
+                    board_play.select(col, row)
+                elif event.key == pygame.K_LEFT and col != 1:
+                    board_play.select(10, 10)
+                    col, row = (col - 1, row)
+                    board_play.select(col, row)
+                elif event.key == pygame.K_RIGHT and col != 9:
+                    board_play.select(10, 10)
+                    col, row = (col + 1, row)
+                    board_play.select(col, row)
+        if board_play.is_full():
+            if board_play.check_board() == True:
+                running = False
+    if board_play.check_board() == True:
+        return 1
+    else:
+        return 2
+
+
+
+
 
 
 def main():
-
-    #EVERYTHING HERE IS FOR TESTING
-    # print(p.board)
-    # SudokuGenerator.is_valid(p, 1, 1, 9)
-    # p.fill_diagonal()
-    # p.print_board()
-    # print(" ")
-    # p.fill_remaining(0, 0)
-    # p.print_board()
-    # print(" ")
-    # p.remove_cells()
-    # p.print_board()
-
-
-    #Need to prompt user for gamemode easy medium or hard
-    #in the call below I am passing in 50 for a hard game
-
-    #I modified generate_sudoku to return the board (b) and the solution to the board (a)
-    b = generate_sudoku(9, 50)
-    print(b)
 
     #Initialises pygame
     while True:

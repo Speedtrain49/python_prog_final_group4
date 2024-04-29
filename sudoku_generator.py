@@ -243,6 +243,7 @@ class SudokuGenerator:
         #randomizes positions
         random.shuffle(positions)
 
+
         #for loop to remove the numbers at the randomized positions
         for x in range(min(self.removed_cells, len(positions))):
             row, col = positions.pop()

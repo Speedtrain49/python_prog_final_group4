@@ -10,8 +10,7 @@ class Board:
         self.height = height
         self.screen = screen
         self.difficulty = difficulty
-        self.sudoku, self.ansSudoku = generate_sudoku(9,difficulty)
-
+        self.sudoku, self.sudokuans = generate_sudoku(9,difficulty)
     def draw(self):
         self.cell_list = []
         xval = 55
@@ -92,5 +91,44 @@ class Board:
 
     def check_board(self):
         input_list = []
+        input_list_add = []
+        count = 0
+        block = 0
         for cell in self.cell_list:
-            input_list.apend(cell.set_value)
+            count += 1
+            if count > 9:
+                input_list.append(input_list_add)
+                input_list_add = []
+                count = 1
+            input_list_add.append(cell.set_value)
+        input_list.append(input_list_add)
+        for list in input_list:
+            for sub_list in list:
+                num = sub_list
+                count = 0
+                for sub_list in list:
+                    if num == sub_list:
+                        count += 1
+                    if count >= 2:
+                        return False
+        for i in range(9):
+            num = i
+            count = 0
+            for list in input_list:
+                if i == list[num]:
+                    count += 1
+                if count >= 2:
+                    return False
+        for i in range(3):
+            block += 3
+            list1 = input_list[block - 3]
+            list2 = input_list[block - 2]
+            list3 = input_list[block - 1]
+            n = 0
+            for i in range(3):
+                if list1[n] == list2[n+1] or list1[n] == list3[n+1] or list1[n] == list2[n+2] or list1[n] == list3[n+2] or list1[n+1] == list2[n] or list1[n+1] == list3[n] or list1[n+1] == list2[n+2] or list1[n+1] == list3[n+2] or list1[n+2] == list2[n+1] or list1[n+2] == list3[n+1] or list1[n+2] == list2[n] or list1[n+2] == list3[n]:
+                    return False
+                if list2[n] == list3[n+1] or list2[n] == list3[n+2] or list2[n+1] == list2[n] or list2[n+1] == list3[n+2] or list2[n+2] == list3[n] or list2[n+2] == list3[n+1]:
+                    return False
+                n += 3
+        return True
