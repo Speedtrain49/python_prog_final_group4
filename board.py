@@ -10,7 +10,7 @@ class Board:
         self.height = height
         self.screen = screen
         self.difficulty = difficulty
-        self.sudoku, self.sudokuans = generate_sudoku(9,difficulty)
+        self.sudoku = generate_sudoku(9,difficulty)
     def draw(self):
         self.cell_list = []
         xval = 55

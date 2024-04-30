@@ -285,8 +285,7 @@ def play(screen, mode):
                     col, row = (col + 1, row)
                     board_play.select(col, row)
         if board_play.is_full():
-            if board_play.check_board() == True:
-                running = False
+            running = False
     if board_play.check_board() == True:
         return 1
     else:
